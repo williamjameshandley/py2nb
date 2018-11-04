@@ -48,6 +48,4 @@ Here is example code:
    fig, ax = plt.subplots()
    ax.plot(x,y)
       
-and the notebook produced from the script
-
-.. html::
+and the notebook produced from the script can be seen `here <https://raw.githubusercontent.com/williamjameshandley/py2nb/master/figures/example.html>`
