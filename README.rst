@@ -18,6 +18,7 @@ Description
 Here is example code:
 
 .. code:: python
+
    #| # Testing ipython notebook
    #| This is designed to demonstrate a simple script that converts a script into
    #| a jupyter notebook with a simple additional markdown format.
@@ -48,4 +49,4 @@ Here is example code:
    fig, ax = plt.subplots()
    ax.plot(x,y)
       
-and the notebook produced from the script can be seen `here <https://raw.githubusercontent.com/williamjameshandley/py2nb/master/figures/example.html>`
+and the notebook produced from the script can be seen `here <https://raw.githubusercontent.com/williamjameshandley/py2nb/master/example.html>`_
