@@ -55,6 +55,4 @@ Converting via the script
    
    py2nb example.py
 
-produces the notebook `example.ipynb <https://williamjameshandley.github.io/py2nb/example.html>`_
-
-
+produces the notebook `example.ipynb <https://github.com/williamjameshandley/py2nb/blob/master/example.ipynb>`_
