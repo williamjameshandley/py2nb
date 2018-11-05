@@ -19,6 +19,30 @@ markdown to jupyter notebooks.
 Markdown cells are rendered from comments beginning with ``#|``, splits between
 code cells are created by comment lines beginning with ``#-``
 
+Installation
+============
+
+Users can install using pip:
+
+.. code:: bash
+
+   pip install py2nb
+
+from source:
+
+.. code:: bash
+
+   git clone https://github.com/williamjameshandley/py2nb
+   cd py2nb
+   python setup.py install
+
+or for those on `Arch linux <https://www.archlinux.org/>`__ it is
+available on the
+`AUR <https://aur.archlinux.org/packages/python-py2nb/>`__
+
+Example
+=======
+
 If one has a script named ``example.py`` containing the code:
 
 .. code:: python
@@ -61,29 +85,6 @@ then running
 
    
 produces the notebook `example.ipynb <https://github.com/williamjameshandley/py2nb/blob/master/example.ipynb>`_
-
-Installation
-===============
-
-Users can install using pip:
-
-.. code:: bash
-
-   pip install py2nb
-
-from source:
-
-.. code:: bash
-
-   git clone https://github.com/williamjameshandley/py2nb
-   cd py2nb
-   python setup.py install
-
-or for those on `Arch linux <https://www.archlinux.org/>`__ it is
-available on the
-`AUR <https://aur.archlinux.org/packages/python-py2nb/>`__
-
-
 
 To do
 =====
