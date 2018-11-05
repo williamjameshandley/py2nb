@@ -13,9 +13,9 @@ py2nb: convert python scripts to jupyter notebooks
 Description
 ===========
 
-``py2nb`` is a python package for converting python scripts with minimal markdown to jupyternotebooks.
+``py2nb`` is a python package for converting python scripts with minimal markdown to jupyter notebooks.
 
-Here is example code, saved as `example.py`:
+Here is example code, saved as ``example.py``:
 
 .. code:: python
 
@@ -55,6 +55,12 @@ Converting via the script
    
    py2nb example.py
 
-produces the notebook `example.ipynb <https://williamjameshandley.github.io/py2nb/example.html>`_
+   
+produces the notebook `example.ipynb <https://github.com/williamjameshandley/py2nb/blob/master/example.ipynb>`_
 
 
+To do
+=====
+- reverse script
+- evaluation option for script produced
+- vim syntax highlighting for markdown code blocks
