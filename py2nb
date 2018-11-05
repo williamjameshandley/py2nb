@@ -31,7 +31,7 @@ def new_cell(nb, cell, markdown=False):
     return ''
 
 
-def py2nb(script_name):
+def convert(script_name):
     """ Convert the python script to jupyter notebook"""
     with open(script_name) as f:
         markdown_cell = ''
@@ -55,11 +55,18 @@ def py2nb(script_name):
         nbformat.write(nb, notebook_name)
 
 
+def parse_args():
+    """Argument parsing for py2nb"""
+    description = "Convert a python script to a jupyter notebook"
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("script_name", help="name of script (.py) to convert to jupyter notebook (.ipynb)")
+    return parser.parse_args() 
+
+
+def main():
+    args = parse_args()
+    convert(args.script_name)
+
+
 if __name__ == '__main__':
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("script_name", help="file name of python script (.py) to convert to jupyter notebook (.ipynb)")
-
-    args = parser.parse_args()
-
-    py2nb(args.script_name)
+    main()
