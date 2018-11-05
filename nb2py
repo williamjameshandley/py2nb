@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""Create a notebook containing code from a script.
+
+Run as:  python to_noteebook.py my_script.py
+"""
+import os
+import argparse
+import json
+
+
+def convert(notebook_name):
+    """ Convert the jupyter notebook to python script"""
+    script_name = os.path.splitext(notebook_name)[0] + '.py'
+    with open(notebook_name, 'r') as f_in:
+        with open(script_name, 'w') as f_out:
+            last_source = ''
+            f_in = json.load(f_in)
+            for cell in f_in['cells']:
+                if last_source == 'code' and cell['cell_type'] == 'code':
+                    f_out.write('#-------------------------------\n\n')
+                for line in cell['source']:
+                    if cell['cell_type'] == 'markdown':
+                        line = '#| ' + line.lstrip()
+                    line = line.rstrip() + '\n'
+                    f_out.write(line)
+                f_out.write('\n')
+                last_source = cell['cell_type']
+
+
+def parse_args():
+    """Argument parsing for py2nb"""
+    description = "Convert a python script to a jupyter notebook"
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument("notebook_name", help="name of notebok (.ipynb) to convert to script (.py)")
+    return parser.parse_args() 
+
+
+def main():
+    args = parse_args()
+    convert(args.notebook_name)
+
+
+if __name__ == '__main__':
+    main()

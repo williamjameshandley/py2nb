@@ -3,7 +3,7 @@
 #| a jupyter notebook with a simple additional markdown format.
 #|
 #| Code by default will be put into code cells
-#| 
+#|
 #| * To make a markdown cell, prefix the comment line with with '#|'
 #| * To split a code cell, add a line beginning with '#-'
 
@@ -17,7 +17,9 @@ import matplotlib.pyplot as plt
 #| There are code cells below, split by '#-':
 
 x = numpy.random.rand(5)
-#---------------------------
+
+#-------------------------------
+
 y = numpy.random.rand(4)
 z = numpy.random.rand(3)
 
@@ -27,3 +29,4 @@ x = numpy.linspace(-2,2,1000)
 y = x**3
 fig, ax = plt.subplots()
 ax.plot(x,y)
+
