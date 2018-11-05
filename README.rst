@@ -3,7 +3,7 @@ py2nb: convert python scripts to jupyter notebooks
 ==================================================
 :py2nb: convert python scripts to jupyter notebooks
 :Author: Will Handley
-:Version: 0.0.0
+:Version: 0.0.1
 :Homepage: https://github.com/williamjameshandley/py2nb
 
 .. image:: https://badge.fury.io/py/py2nb.svg
@@ -13,9 +13,13 @@ py2nb: convert python scripts to jupyter notebooks
 Description
 ===========
 
-``py2nb`` is a python package for converting python scripts with minimal markdown to jupyter notebooks.
+``py2nb`` is a python package for converting python scripts with minimal
+markdown to jupyter notebooks. 
 
-Here is example code, saved as ``example.py``:
+Markdown cells are rendered from comments beginning with ``#|``, splits between
+code cells are created by comment lines beginning with ``#-``
+
+If one has a script named ``example.py`` containing the code:
 
 .. code:: python
 
@@ -49,7 +53,7 @@ Here is example code, saved as ``example.py``:
    fig, ax = plt.subplots()
    ax.plot(x,y)
 
-Converting via the script
+then running
 
 .. code :: bash
    
@@ -57,6 +61,28 @@ Converting via the script
 
    
 produces the notebook `example.ipynb <https://github.com/williamjameshandley/py2nb/blob/master/example.ipynb>`_
+
+Installation
+===============
+
+Users can install using pip:
+
+.. code:: bash
+
+   pip install py2nb
+
+from source:
+
+.. code:: bash
+
+   git clone https://github.com/williamjameshandley/py2nb
+   cd py2nb
+   python setup.py install
+
+or for those on `Arch linux <https://www.archlinux.org/>`__ it is
+available on the
+`AUR <https://aur.archlinux.org/packages/python-py2nb/>`__
+
 
 
 To do
