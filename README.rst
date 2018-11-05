@@ -15,7 +15,7 @@ Description
 
 ``py2nb`` is a python package for converting python scripts with minimal markdown to jupyternotebooks.
 
-Here is example code:
+Here is example code, saved as `example.py`:
 
 .. code:: python
 
@@ -48,5 +48,13 @@ Here is example code:
    y = x**3
    fig, ax = plt.subplots()
    ax.plot(x,y)
-      
-and the notebook produced from the script can be seen `here <https://raw.githubusercontent.com/williamjameshandley/py2nb/master/example.html>`_
+
+Converting via the script
+
+.. code :: bash
+   
+   py2nb example.py
+
+produces the notebook `example.ipynb <https://williamjameshandley.github.io/py2nb/example.html>`_
+
+
