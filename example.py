@@ -4,17 +4,20 @@
 #|
 #| Code by default will be put into code cells
 #|
-#| * To make a markdown cell, prefix the comment line with with '#|'
-#| * To split a code cell, add a line beginning with '#-'
+#| * To make a markdown cell, prefix the comment line with with '#|' or '# |'
+#| * To split a code cell, add a line beginning with '#-' or '# -'
 
-import numpy
 import matplotlib.pyplot as plt
+import numpy
+
 %matplotlib inline
 
 #| Here is a markdown cell.
 #| Maths is also possible: $A=B$
 #|
-#| There are code cells below, split by '#-':
+#| There are code cells below, split by `'#-'`:
+
+# | Here is another markdown cell
 
 x = numpy.random.rand(5)
 
@@ -30,3 +33,10 @@ y = x**3
 fig, ax = plt.subplots()
 ax.plot(x,y)
 
+# -------------------------------
+
+# | Here is another plot
+
+x = np.linspace(-np.pi, np.pi, 201)
+fig, ax = plt.subplots()
+ax.plot(x,np.sin(x))

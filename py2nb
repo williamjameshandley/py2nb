@@ -3,9 +3,14 @@
 
 Run as:  python to_noteebook.py my_script.py
 """
-import os
-import nbformat.v4
 import argparse
+import os
+
+import nbformat.v4
+
+ACCEPTED_CHARS = ['#-', '# -']
+MARKDOWN_CHARS = ['#|', '# |']
+ACCEPTED_CHARS.extend(MARKDOWN_CHARS)
 
 def new_cell(nb, cell, markdown=False):
     """ Create a new cell
@@ -30,6 +35,11 @@ def new_cell(nb, cell, markdown=False):
         nb.cells.append(cell)
     return ''
 
+def str_starts_with(string, options):
+    for opt in options:
+        if string.startswith(opt):
+            return True
+
 
 def convert(script_name):
     """ Convert the python script to jupyter notebook"""
@@ -38,10 +48,12 @@ def convert(script_name):
         code_cell = ''
         nb = nbformat.v4.new_notebook()
         for line in f:
-            if line[:2] == '#-' or line[:2] == '#|':
+            if str_starts_with(line, ACCEPTED_CHARS):
                 code_cell = new_cell(nb, code_cell)
-                if line[:2] == '#|':
-                    markdown_cell += line[2:]
+                if str_starts_with(line, MARKDOWN_CHARS):
+                    # find the first occurence of |
+                    # and add the rest of the line to the markdown cell
+                    markdown_cell += line[line.index('|') + 1:]
                 else:
                     markdown_cell = new_cell(nb, markdown_cell, markdown=True)
             else:
@@ -59,8 +71,10 @@ def parse_args():
     """Argument parsing for py2nb"""
     description = "Convert a python script to a jupyter notebook"
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("script_name", help="name of script (.py) to convert to jupyter notebook (.ipynb)")
-    return parser.parse_args() 
+    parser.add_argument(
+        "script_name",
+        help="name of script (.py) to convert to jupyter notebook (.ipynb)")
+    return parser.parse_args()
 
 
 def main():
