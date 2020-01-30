@@ -5,7 +5,7 @@
 #| Code by default will be put into code cells
 #|
 #| * To make a markdown cell, prefix the comment line with with '#|' or '# |'
-#| * To split a code cell, add a line beginning with '#-' or '# -#
+#| * To split a code cell, add a line beginning with '#-' or '# -'
 
 import matplotlib.pyplot as plt
 import numpy
