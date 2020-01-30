@@ -8,9 +8,9 @@ import os
 
 import nbformat.v4
 
-CODE_SPLIT_CHARS = ['#-', '# -']
+ACCEPTED_CHARS = ['#-', '# -']
 MARKDOWN_CHARS = ['#|', '# |']
-
+ACCEPTED_CHARS.extend(MARKDOWN_CHARS)
 
 def new_cell(nb, cell, markdown=False):
     """ Create a new cell
@@ -35,6 +35,11 @@ def new_cell(nb, cell, markdown=False):
         nb.cells.append(cell)
     return ''
 
+def str_starts_with(string, options):
+    for opt in options:
+        if string.startswith(opt):
+            return True
+
 
 def convert(script_name):
     """ Convert the python script to jupyter notebook"""
@@ -43,9 +48,9 @@ def convert(script_name):
         code_cell = ''
         nb = nbformat.v4.new_notebook()
         for line in f:
-            if line.startswith((*CODE_SPLIT_CHARS, *MARKDOWN_CHARS)):
+            if str_starts_with(line, ACCEPTED_CHARS):
                 code_cell = new_cell(nb, code_cell)
-                if line.startswith((*MARKDOWN_CHARS, )):
+                if str_starts_with(line, MARKDOWN_CHARS):
                     # find the first occurence of |
                     # and add the rest of the line to the markdown cell
                     markdown_cell += line[line.index('|') + 1:]
