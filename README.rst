@@ -59,7 +59,7 @@ If one has a script named ``example.py`` containing the code:
     #| * To split a code cell, add a line beginning with '#-' or '# -'
 
     import matplotlib.pyplot as plt
-    import numpy
+    import numpy as np
 
     %matplotlib inline
 
@@ -70,16 +70,16 @@ If one has a script named ``example.py`` containing the code:
 
     # | Here is another markdown cell
 
-    x = numpy.random.rand(5)
+    x = np.random.rand(5)
 
     #-------------------------------
 
-    y = numpy.random.rand(4)
-    z = numpy.random.rand(3)
+    y = np.random.rand(4)
+    z = np.random.rand(3)
 
     #| Here are some plots
 
-    x = numpy.linspace(-2,2,1000)
+    x = np.linspace(-2,2,1000)
     y = x**3
     fig, ax = plt.subplots()
     ax.plot(x,y)
