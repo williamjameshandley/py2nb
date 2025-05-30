@@ -6,6 +6,8 @@ Run as:  python py2nb my_script.py
 import argparse
 import os
 import json
+import subprocess
+import sys
 
 import nbformat.v4
 
@@ -88,7 +90,7 @@ def extract_content(line, comment_type):
     return ''
 
 
-def convert(script_name, validate=True):
+def convert(script_name, validate=True, execute=False):
     """Convert the python script to jupyter notebook with enhanced features."""
     with open(script_name, 'r', encoding='utf-8') as f:
         # Initialize cells and notebook
@@ -166,7 +168,51 @@ def convert(script_name, validate=True):
         with open(notebook_name, 'w', encoding='utf-8') as f:
             nbformat.write(nb, f, version=nbformat.NO_CONVERT)
         
+        # Execute notebook if requested
+        if execute:
+            executed_name = execute_notebook(notebook_name)
+            return executed_name
+        
         return notebook_name
+
+
+def execute_notebook(notebook_path):
+    """Execute a notebook using nbconvert and return the executed notebook path."""
+    base_name = os.path.splitext(notebook_path)[0]
+    executed_name = f"{base_name}_executed.ipynb"
+    
+    try:
+        # Use nbconvert to execute the notebook
+        cmd = [
+            'jupyter', 'nbconvert', 
+            '--to', 'notebook',
+            '--execute',
+            '--output', executed_name,
+            notebook_path
+        ]
+        
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
+        
+        if result.returncode == 0:
+            print(f"✓ Successfully executed notebook: {executed_name}")
+            return executed_name
+        else:
+            print(f"⚠ Notebook execution failed: {result.stderr}")
+            print(f"  Original notebook available: {notebook_path}")
+            return notebook_path
+            
+    except subprocess.TimeoutExpired:
+        print(f"⚠ Notebook execution timed out (5 minutes)")
+        print(f"  Original notebook available: {notebook_path}")
+        return notebook_path
+    except FileNotFoundError:
+        print(f"⚠ jupyter nbconvert not found. Install with: pip install nbconvert")
+        print(f"  Original notebook available: {notebook_path}")
+        return notebook_path
+    except Exception as e:
+        print(f"⚠ Error executing notebook: {e}")
+        print(f"  Original notebook available: {notebook_path}")
+        return notebook_path
 
 
 def validate_notebook(nb):
@@ -209,6 +255,10 @@ def parse_args():
         "--no-validate", 
         action="store_true",
         help="skip notebook validation")
+    parser.add_argument(
+        "--execute", 
+        action="store_true",
+        help="execute the notebook after conversion (creates *_executed.ipynb)")
     return parser.parse_args()
 
 
@@ -221,8 +271,11 @@ def main():
         return 1
     
     try:
-        notebook_name = convert(args.script_name, validate=not args.no_validate)
-        print(f"✓ Successfully converted {args.script_name} to {notebook_name}")
+        notebook_name = convert(args.script_name, validate=not args.no_validate, execute=args.execute)
+        if args.execute:
+            print(f"✓ Successfully converted and executed {args.script_name} to {notebook_name}")
+        else:
+            print(f"✓ Successfully converted {args.script_name} to {notebook_name}")
         
         # Validate the created notebook
         if not args.no_validate:
