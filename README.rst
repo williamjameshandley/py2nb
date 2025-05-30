@@ -3,7 +3,7 @@ py2nb: convert python scripts to jupyter notebooks
 ==================================================
 :py2nb: convert python scripts to jupyter notebooks
 :Author: Will Handley
-:Version: 1.0.0
+:Version: 1.1.0
 :Homepage: https://github.com/williamjameshandley/py2nb
 
 .. image:: https://badge.fury.io/py/py2nb.svg
@@ -187,6 +187,46 @@ The test suite includes 16 test cases covering:
 * Backward compatibility
 * Error handling
 
-To do
-=====
-- vim syntax highlighting for markdown code blocks
+Vim Integration
+===============
+
+For vim users working with py2nb syntax, you can enhance your editing experience:
+
+**Syntax Highlighting**
+
+Add to your ``.vimrc`` for basic py2nb syntax support:
+
+.. code:: vim
+
+   " py2nb syntax highlighting
+   autocmd BufRead,BufNewFile *.py syntax match Comment "#|.*$" 
+   autocmd BufRead,BufNewFile *.py syntax match Special "#!.*$"
+   autocmd BufRead,BufNewFile *.py syntax match Delimiter "#-.*$"
+
+**File Templates**
+
+Create a py2nb template in ``~/.vim/templates/py2nb.py``:
+
+.. code:: python
+
+   #| # Workshop Title
+   #| 
+   #| Brief description and learning objectives
+   
+   #! pip install required_packages
+   
+   import standard_libraries
+   
+   #| ## Section 1: Core Concepts
+   #| Essential material description
+   
+   # Your code here
+   
+   #-
+   
+   # Next code cell
+   
+   #| ## Section 2: Advanced Topics
+   #| Building on previous concepts
+
+Then use ``:read ~/.vim/templates/py2nb.py`` to insert the template.
