@@ -90,7 +90,7 @@ def extract_content(line, comment_type):
     return ''
 
 
-def convert(script_name, validate=True, execute=False):
+def convert(script_name, validate=True, execute=False, output_name=None):
     """Convert the python script to jupyter notebook with enhanced features."""
     with open(script_name, 'r', encoding='utf-8') as f:
         # Initialize cells and notebook
@@ -157,7 +157,12 @@ def convert(script_name, validate=True, execute=False):
             validate_notebook(nb)
 
         # Write notebook with consistent format (avoid auto-generated ids)
-        notebook_name = os.path.splitext(script_name)[0] + '.ipynb'
+        if output_name:
+            notebook_name = output_name
+            if not notebook_name.endswith('.ipynb'):
+                notebook_name += '.ipynb'
+        else:
+            notebook_name = os.path.splitext(script_name)[0] + '.ipynb'
         
         # Remove any auto-generated cell ids to maintain clean format
         for cell in nb.cells:
@@ -178,8 +183,7 @@ def convert(script_name, validate=True, execute=False):
 
 def execute_notebook(notebook_path):
     """Execute a notebook using nbconvert and return the executed notebook path."""
-    base_name = os.path.splitext(notebook_path)[0]
-    executed_name = f"{base_name}_executed.ipynb"
+    executed_name = notebook_path
     
     try:
         # Use nbconvert to execute the notebook
@@ -187,7 +191,7 @@ def execute_notebook(notebook_path):
             'jupyter', 'nbconvert', 
             '--to', 'notebook',
             '--execute',
-            '--output', executed_name,
+            '--inplace',
             notebook_path
         ]
         
@@ -258,7 +262,10 @@ def parse_args():
     parser.add_argument(
         "--execute", 
         action="store_true",
-        help="execute the notebook after conversion (creates *_executed.ipynb)")
+        help="execute the notebook after conversion")
+    parser.add_argument(
+        "--output", 
+        help="specify output notebook filename (default: script_name.ipynb)")
     return parser.parse_args()
 
 
@@ -271,7 +278,7 @@ def main():
         return 1
     
     try:
-        notebook_name = convert(args.script_name, validate=not args.no_validate, execute=args.execute)
+        notebook_name = convert(args.script_name, validate=not args.no_validate, execute=args.execute, output_name=args.output)
         if args.execute:
             print(f"✓ Successfully converted and executed {args.script_name} to {notebook_name}")
         else:

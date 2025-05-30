@@ -111,9 +111,14 @@ Command Line Options
 
 .. code:: bash
 
-   py2nb script.py                 # Basic conversion
-   py2nb script.py --no-validate   # Skip notebook validation  
-   py2nb script.py --execute       # Convert and execute (creates *_executed.ipynb)
+   py2nb script.py                      # Basic conversion
+   py2nb script.py --no-validate        # Skip notebook validation  
+   py2nb script.py --execute            # Convert and execute notebook
+   py2nb script.py --output workshop    # Custom output name
+   py2nb script.py --output workshop --execute  # Custom name + execution
+
+   nb2py notebook.ipynb                 # Convert notebook to script
+   nb2py notebook.ipynb --output script # Custom output script name
 
 Command Blocks
 ==============
@@ -149,11 +154,13 @@ creating a new notebook with outputs included:
 
 .. code:: bash
 
-   py2nb workshop.py --execute
+   py2nb workshop.py --execute                    # Execute in place
+   py2nb workshop.py --output clean               # Create clean.ipynb
+   py2nb workshop.py --output executed --execute  # Create executed.ipynb with outputs
 
-This creates both ``workshop.ipynb`` (clean) and ``workshop_executed.ipynb`` (with outputs).
-Useful for creating workshop materials with pre-computed results, or for testing
-that your workshop notebooks execute successfully.
+The ``--output`` option allows you to specify custom filenames, giving you complete control
+over the generated notebook names. Useful for creating workshop materials with pre-computed 
+results, or for testing that your workshop notebooks execute successfully.
 
 **Requirements**: Requires ``nbconvert`` to be installed (``pip install nbconvert``).
 
@@ -166,13 +173,15 @@ To run the test suite:
 
    python test_py2nb.py
 
-The test suite includes 14 test cases covering:
+The test suite includes 16 test cases covering:
 
 * Basic conversion functionality
 * Markdown cell creation (``#|`` syntax)
 * Code cell splitting (``#-`` syntax)
 * Command block creation (``#!`` syntax)
 * Notebook execution (``--execute`` option)
+* Custom output filenames (``--output`` option)
+* nb2py reverse conversion with custom output
 * Mixed syntax combinations
 * Notebook metadata and validation
 * Backward compatibility

@@ -334,6 +334,63 @@ print("Test passed!")"""
             # This is acceptable behavior for the test environment
             pass
 
+    def test_custom_output_name(self):
+        """Test custom output filename functionality."""
+        script_content = """#| # Custom Output Test
+import math
+result = math.sqrt(4)"""
+        
+        script_path = self.create_test_script(script_content)
+        
+        # Test py2nb with custom output name
+        custom_notebook = py2nb.convert(script_path, output_name="custom_name")
+        self.assertTrue(custom_notebook.endswith("custom_name.ipynb"))
+        self.assertTrue(os.path.exists(custom_notebook))
+        
+        # Test py2nb with custom output name including extension
+        custom_notebook2 = py2nb.convert(script_path, output_name="custom_name2.ipynb")
+        self.assertTrue(custom_notebook2.endswith("custom_name2.ipynb"))
+        self.assertTrue(os.path.exists(custom_notebook2))
+
+    def test_nb2py_custom_output(self):
+        """Test nb2py with custom output names."""
+        # Create a simple notebook first  
+        script_content = """#| # Test Notebook
+#! pip install numpy
+import numpy as np
+x = np.array([1, 2, 3])"""
+        
+        script_path = self.create_test_script(script_content)
+        notebook_path = py2nb.convert(script_path)
+        
+        # Test nb2py conversion with subprocess
+        import subprocess
+        
+        # Test default conversion
+        result = subprocess.run(['python', 'nb2py', notebook_path], 
+                               capture_output=True, text=True, cwd=os.getcwd())
+        self.assertEqual(result.returncode, 0)
+        
+        # Test custom output conversion
+        custom_output = "custom_output.py"
+        result = subprocess.run(['python', 'nb2py', notebook_path, '--output', custom_output], 
+                               capture_output=True, text=True, cwd=os.getcwd())
+        self.assertEqual(result.returncode, 0)
+        
+        # Check that custom output file was created
+        expected_path = os.path.join(os.getcwd(), custom_output)
+        self.assertTrue(os.path.exists(expected_path))
+        
+        # Check content includes command syntax
+        with open(expected_path, 'r') as f:
+            content = f.read()
+        self.assertIn("#! pip install numpy", content)
+        self.assertIn("#| # Test Notebook", content)
+        
+        # Clean up
+        if os.path.exists(expected_path):
+            os.remove(expected_path)
+
 
 if __name__ == '__main__':
     # Allow running tests directly

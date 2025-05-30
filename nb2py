@@ -8,9 +8,14 @@ import argparse
 import json
 
 
-def convert(notebook_name):
+def convert(notebook_name, output_name=None):
     """ Convert the jupyter notebook to python script"""
-    script_name = os.path.splitext(notebook_name)[0] + '.py'
+    if output_name:
+        script_name = output_name
+        if not script_name.endswith('.py'):
+            script_name += '.py'
+    else:
+        script_name = os.path.splitext(notebook_name)[0] + '.py'
     with open(notebook_name, 'r') as f_in:
         with open(script_name, 'w') as f_out:
             last_source = ''
@@ -34,6 +39,8 @@ def convert(notebook_name):
                     f_out.write(line)
                 f_out.write('\n')
                 last_source = cell['cell_type']
+    
+    return script_name
 
 
 def parse_args():
@@ -41,12 +48,17 @@ def parse_args():
     description = "Convert a jupyter notebook to a python script"
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("notebook_name", help="name of notebok (.ipynb) to convert to script (.py)")
+    parser.add_argument(
+        "--output", 
+        help="specify output script filename (default: notebook_name.py)")
     return parser.parse_args() 
 
 
 def main():
     args = parse_args()
-    convert(args.notebook_name)
+    script_name = convert(args.notebook_name, output_name=args.output)
+    print(f"✓ Successfully converted {args.notebook_name} to {script_name}")
+    return script_name
 
 
 if __name__ == '__main__':
