@@ -391,7 +391,6 @@ x = np.array([1, 2, 3])"""
         if os.path.exists(expected_path):
             os.remove(expected_path)
 
-
 if __name__ == '__main__':
     # Allow running tests directly
     unittest.main()
