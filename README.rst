@@ -43,6 +43,27 @@ or for those on `Arch linux <https://www.archlinux.org/>`__ it is
 available on the
 `AUR <https://aur.archlinux.org/packages/python-py2nb/>`__
 
+Programmatic Usage
+==================
+
+Both ``py2nb`` and ``nb2py`` can be imported and used programmatically:
+
+.. code:: python
+
+   import py2nb
+   import nb2py
+   
+   # Convert script to notebook
+   notebook_path = py2nb.convert('script.py')
+   
+   # Convert with custom output and execution
+   executed_notebook = py2nb.convert('script.py', 
+                                     output_name='workshop.ipynb', 
+                                     execute=True)
+   
+   # Convert notebook back to script  
+   script_path = nb2py.convert('notebook.ipynb', output_name='converted.py')
+
 Example
 =======
 
@@ -182,8 +203,10 @@ The test suite includes 16 test cases covering:
 * Notebook execution (``--execute`` option)
 * Custom output filenames (``--output`` option)
 * nb2py reverse conversion with custom output
+* Programmatic module usage
 * Mixed syntax combinations
 * Notebook metadata and validation
+* UTF-8 encoding support
 * Backward compatibility
 * Error handling
 

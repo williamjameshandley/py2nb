@@ -8,39 +8,8 @@ import unittest
 from unittest.mock import patch
 import nbformat
 
-# Import py2nb functions by reading and executing only the function definitions
-import sys
-import os
-
-# Read py2nb script and extract only function definitions
-with open('py2nb', 'r') as f:
-    content = f.read()
-
-# Execute only the parts we need (up to main function, but not the main call)
-lines = content.split('\n')
-func_lines = []
-in_main_call = False
-
-for line in lines:
-    if line.strip() == "if __name__ == '__main__':":
-        in_main_call = True
-        break
-    func_lines.append(line)
-
-# Execute the function definitions
-exec('\n'.join(func_lines))
-
-# Create a mock module for the functions
-class MockPy2nb:
-    def __init__(self):
-        # Copy all functions from global namespace
-        self.convert = convert
-        self.get_comment_type = get_comment_type
-        self.extract_content = extract_content
-        self.main = main
-        self.validate_notebook = validate_notebook
-        
-py2nb = MockPy2nb()
+# Import py2nb module directly
+import py2nb
 
 
 class TestPy2nb(unittest.TestCase):
