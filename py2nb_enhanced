@@ -1,0 +1,247 @@
+#!/usr/bin/env python3
+"""Enhanced py2nb: Create notebooks with proper metadata and install blocks.
+
+Run as:  python py2nb_enhanced my_script.py
+
+New features:
+- #! syntax for pip install blocks
+- Proper notebook metadata
+- Validation of notebook structure
+- Support for modern nbformat versions
+"""
+import argparse
+import os
+import json
+
+import nbformat.v4
+
+# Comment syntax patterns
+CELL_SPLIT_CHARS = ['#-', '# -']
+MARKDOWN_CHARS = ['#|', '# |']
+INSTALL_CHARS = ['#!', '# !']
+ACCEPTED_CHARS = CELL_SPLIT_CHARS + MARKDOWN_CHARS + INSTALL_CHARS
+
+def new_cell(nb, cell_content, cell_type='code'):
+    """Create a new cell with proper metadata.
+    
+    Parameters
+    ----------
+    nb: nbformat.notebooknode.NotebookNode
+        Notebook to write to, as produced by nbformat.v4.new_notebook()
+    cell_content: str
+        String content for the cell
+    cell_type: str, optional
+        Type of cell: 'code', 'markdown', or 'install'
+    
+    Returns
+    -------
+    str
+        Empty string (resets cell content)
+    """
+    cell_content = cell_content.rstrip().lstrip()
+    if cell_content:
+        if cell_type == 'markdown':
+            cell = nbformat.v4.new_markdown_cell(cell_content)
+        elif cell_type == 'install':
+            # Create code cell with install content
+            cell = nbformat.v4.new_code_cell(cell_content)
+            # Add metadata to identify as install cell
+            cell.metadata.update({
+                'tags': ['install'],
+                'collapsed': False
+            })
+        else:  # code cell
+            cell = nbformat.v4.new_code_cell(cell_content)
+        
+        # Ensure proper execution count for clean notebooks
+        if hasattr(cell, 'execution_count'):
+            cell.execution_count = None
+            
+        # Ensure outputs field exists and is empty for code cells
+        if cell.cell_type == 'code' and not hasattr(cell, 'outputs'):
+            cell.outputs = []
+            
+        nb.cells.append(cell)
+    return ''
+
+def str_starts_with(string, options):
+    """Check if string starts with any of the given options."""
+    for opt in options:
+        if string.startswith(opt):
+            return True
+    return False
+
+def get_comment_type(line):
+    """Determine the type of comment based on prefix."""
+    if str_starts_with(line, INSTALL_CHARS):
+        return 'install'
+    elif str_starts_with(line, MARKDOWN_CHARS):
+        return 'markdown'
+    elif str_starts_with(line, CELL_SPLIT_CHARS):
+        return 'split'
+    return None
+
+def extract_content(line, comment_type):
+    """Extract content from comment line based on type."""
+    if comment_type == 'install':
+        # Find first ! and return everything after it
+        return line[line.index('!') + 1:].lstrip()
+    elif comment_type == 'markdown':
+        # Find first | and return everything after it  
+        return line[line.index('|') + 1:]
+    return ''
+
+def convert(script_name, validate=True):
+    """Convert the python script to jupyter notebook with enhanced features."""
+    with open(script_name, 'r', encoding='utf-8') as f:
+        # Initialize cells and notebook
+        markdown_cell = ''
+        code_cell = ''
+        install_cell = ''
+        nb = nbformat.v4.new_notebook()
+        
+        # Set notebook metadata
+        nb.metadata.update({
+            'kernelspec': {
+                'display_name': 'Python 3',
+                'language': 'python',
+                'name': 'python3'
+            },
+            'language_info': {
+                'codemirror_mode': {'name': 'ipython', 'version': 3},
+                'file_extension': '.py',
+                'mimetype': 'text/x-python',
+                'name': 'python',
+                'nbconvert_exporter': 'python',
+                'pygments_lexer': 'ipython3',
+                'version': '3.8.0'
+            }
+        })
+        
+        for line in f:
+            comment_type = get_comment_type(line)
+            
+            if comment_type:
+                # Finish current code cell before processing comment
+                code_cell = new_cell(nb, code_cell, 'code')
+                
+                if comment_type == 'markdown':
+                    # Add to markdown cell
+                    markdown_cell += extract_content(line, 'markdown')
+                elif comment_type == 'install':
+                    # Finish any pending markdown cell
+                    markdown_cell = new_cell(nb, markdown_cell, 'markdown')
+                    # Add to install cell
+                    install_cell += extract_content(line, 'install') + '\n'
+                elif comment_type == 'split':
+                    # Finish any pending cells and start fresh
+                    markdown_cell = new_cell(nb, markdown_cell, 'markdown')
+                    install_cell = new_cell(nb, install_cell, 'install')
+            else:
+                # Regular code line - finish pending markdown/install cells
+                markdown_cell = new_cell(nb, markdown_cell, 'markdown')
+                install_cell = new_cell(nb, install_cell, 'install')
+                # Add to code cell
+                code_cell += line
+
+        # Finish any remaining cells
+        markdown_cell = new_cell(nb, markdown_cell, 'markdown')
+        install_cell = new_cell(nb, install_cell, 'install')
+        code_cell = new_cell(nb, code_cell, 'code')
+
+        # Validate notebook structure if requested
+        if validate:
+            validate_notebook(nb)
+
+        # Write notebook
+        notebook_name = os.path.splitext(script_name)[0] + '.ipynb'
+        nbformat.write(nb, notebook_name, version=4)
+        
+        return notebook_name
+
+def validate_notebook(nb):
+    """Validate notebook structure and fix common issues."""
+    for i, cell in enumerate(nb.cells):
+        # Ensure proper cell structure
+        if not hasattr(cell, 'metadata'):
+            cell.metadata = {}
+        
+        if cell.cell_type == 'code':
+            # Ensure code cells have required fields
+            if not hasattr(cell, 'execution_count'):
+                cell.execution_count = None
+            if not hasattr(cell, 'outputs'):
+                cell.outputs = []
+        elif cell.cell_type == 'markdown':
+            # Ensure markdown cells don't have code cell fields
+            if hasattr(cell, 'execution_count'):
+                delattr(cell, 'execution_count')
+            if hasattr(cell, 'outputs'):
+                delattr(cell, 'outputs')
+        
+        # Ensure source is a list
+        if isinstance(cell.source, str):
+            cell.source = cell.source.splitlines(True)
+
+def create_executed_version(notebook_name):
+    """Create a template for executed version (requires manual execution)."""
+    base_name = os.path.splitext(notebook_name)[0]
+    executed_name = f"{base_name}_executed.ipynb"
+    
+    print(f"✓ Created clean notebook: {notebook_name}")
+    print(f"📝 To create executed version:")
+    print(f"   1. Open {notebook_name} in Jupyter")
+    print(f"   2. Run all cells: Cell → Run All")
+    print(f"   3. Save as: {executed_name}")
+    print(f"   4. Both versions will be ready for distribution")
+
+def parse_args():
+    """Enhanced argument parsing for py2nb."""
+    description = "Convert a python script to jupyter notebook with enhanced features"
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument(
+        "script_name",
+        help="name of script (.py) to convert to jupyter notebook (.ipynb)")
+    parser.add_argument(
+        "--no-validate", 
+        action="store_true",
+        help="skip notebook validation")
+    parser.add_argument(
+        "--executed",
+        action="store_true", 
+        help="create template for executed version")
+    return parser.parse_args()
+
+def main():
+    """Main conversion function."""
+    args = parse_args()
+    
+    if not os.path.exists(args.script_name):
+        print(f"Error: File {args.script_name} not found")
+        return 1
+    
+    try:
+        notebook_name = convert(args.script_name, validate=not args.no_validate)
+        print(f"✓ Successfully converted {args.script_name} to {notebook_name}")
+        
+        if args.executed:
+            create_executed_version(notebook_name)
+            
+        # Validate the created notebook
+        if not args.no_validate:
+            try:
+                with open(notebook_name, 'r') as f:
+                    json.load(f)
+                print("✓ Notebook JSON validation passed")
+            except json.JSONDecodeError as e:
+                print(f"⚠ Notebook JSON validation failed: {e}")
+                return 1
+                
+    except Exception as e:
+        print(f"Error during conversion: {e}")
+        return 1
+    
+    return 0
+
+if __name__ == '__main__':
+    exit(main())
