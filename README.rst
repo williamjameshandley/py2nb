@@ -17,7 +17,8 @@ Description
 markdown to jupyter notebooks.
 
 Markdown cells are rendered from comments beginning with ``#|``, splits between
-code cells are created by comment lines beginning with ``#-``
+code cells are created by comment lines beginning with ``#-``, and command cells
+(for shell commands like pip installs) are created from comments beginning with ``#!``
 
 ``nb2py`` converts from jupyter notebooks to python
 
@@ -55,8 +56,12 @@ If one has a script named ``example.py`` containing the code:
     #|
     #| Code by default will be put into code cells
     #|
-    #| * To make a markdown cell, prefix the comment line with with '#|' or '# |'
+    #| * To make a markdown cell, prefix the comment line with '#|' or '# |'
     #| * To split a code cell, add a line beginning with '#-' or '# -'
+    #| * To make a command cell, prefix the comment line with '#!' or '# !'
+
+    #! pip install matplotlib numpy
+    #! pip install scipy
 
     import matplotlib.pyplot as plt
     import numpy as np
@@ -100,6 +105,60 @@ then running
    py2nb example.py
 
 produces the notebook `example.ipynb <https://github.com/williamjameshandley/py2nb/blob/master/example.ipynb>`_
+
+Command Line Options
+====================
+
+.. code:: bash
+
+   py2nb script.py                 # Basic conversion
+   py2nb script.py --no-validate   # Skip notebook validation
+
+Command Blocks
+==============
+
+Command blocks allow you to run shell commands (like pip installs) in separate notebook cells:
+
+.. code:: python
+
+    #| # Workshop Example
+    #| This demonstrates command blocks for dependency management
+
+    #! pip install numpy matplotlib
+    #! pip install seaborn
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    #| ## Advanced Analysis
+    #| Install additional dependencies when needed
+
+    #! pip install scikit-learn
+
+    from sklearn import datasets
+
+This creates dedicated cells for commands, improving modularity and compatibility
+with platforms like Google Colab.
+
+Testing
+=======
+
+To run the test suite:
+
+.. code:: bash
+
+   python test_py2nb.py
+
+The test suite includes 13 test cases covering:
+
+* Basic conversion functionality
+* Markdown cell creation (``#|`` syntax)
+* Code cell splitting (``#-`` syntax)
+* Command block creation (``#!`` syntax)
+* Mixed syntax combinations
+* Notebook metadata and validation
+* Backward compatibility
+* Error handling
 
 To do
 =====

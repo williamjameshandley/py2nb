@@ -103,9 +103,9 @@ import numpy as np"""
         self.assertIn('# Test Title', ''.join(nb['cells'][0]['source']))
         self.assertEqual(nb['cells'][1]['cell_type'], 'code')
 
-    def test_install_blocks(self):
-        """Test installation block creation with #! syntax."""
-        script_content = """#| # Test Installation Blocks
+    def test_command_blocks(self):
+        """Test command block creation with #! syntax."""
+        script_content = """#| # Test Command Blocks
 
 #! pip install numpy
 #! pip install matplotlib
@@ -119,16 +119,16 @@ import matplotlib.pyplot as plt"""
         with open(notebook_path, 'r') as f:
             nb = json.load(f)
         
-        # Should have: markdown, install, code cells
+        # Should have: markdown, command, code cells
         self.assertEqual(len(nb['cells']), 3)
         self.assertEqual(nb['cells'][0]['cell_type'], 'markdown')
         self.assertEqual(nb['cells'][1]['cell_type'], 'code')
         self.assertEqual(nb['cells'][2]['cell_type'], 'code')
         
-        # Check install cell has install tag
-        install_cell = nb['cells'][1]
-        self.assertIn('install', install_cell.get('metadata', {}).get('tags', []))
-        self.assertIn('pip install numpy', ''.join(install_cell['source']))
+        # Check command cell has command tag
+        command_cell = nb['cells'][1]
+        self.assertIn('command', command_cell.get('metadata', {}).get('tags', []))
+        self.assertIn('pip install numpy', ''.join(command_cell['source']))
 
     def test_cell_splits(self):
         """Test code cell splitting with #- syntax."""
@@ -235,8 +235,8 @@ plt.plot(x)"""
         """Test comment type detection functions."""
         self.assertEqual(py2nb.get_comment_type('#| markdown'), 'markdown')
         self.assertEqual(py2nb.get_comment_type('# | markdown'), 'markdown')
-        self.assertEqual(py2nb.get_comment_type('#! install'), 'install')
-        self.assertEqual(py2nb.get_comment_type('# ! install'), 'install')
+        self.assertEqual(py2nb.get_comment_type('#! install'), 'command')
+        self.assertEqual(py2nb.get_comment_type('# ! install'), 'command')
         self.assertEqual(py2nb.get_comment_type('#- split'), 'split')
         self.assertEqual(py2nb.get_comment_type('# - split'), 'split')
         self.assertIsNone(py2nb.get_comment_type('# regular comment'))
@@ -244,7 +244,7 @@ plt.plot(x)"""
     def test_content_extraction(self):
         """Test content extraction from comment lines."""
         self.assertEqual(py2nb.extract_content('#| markdown text', 'markdown'), ' markdown text')
-        self.assertEqual(py2nb.extract_content('#! pip install numpy', 'install'), 'pip install numpy')
+        self.assertEqual(py2nb.extract_content('#! pip install numpy', 'command'), 'pip install numpy')
         self.assertEqual(py2nb.extract_content('# | spaced markdown', 'markdown'), ' spaced markdown')
 
     def test_file_not_found(self):
