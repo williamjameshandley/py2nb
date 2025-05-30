@@ -97,7 +97,7 @@ def convert(script_name, validate=True):
         command_cell = ''
         nb = nbformat.v4.new_notebook()
         
-        # Set notebook metadata
+        # Set notebook metadata (maintain compatibility with existing notebooks)
         nb.metadata.update({
             'kernelspec': {
                 'display_name': 'Python 3',
@@ -114,6 +114,10 @@ def convert(script_name, validate=True):
                 'version': '3.8.0'
             }
         })
+        
+        # Set consistent nbformat version
+        nb.nbformat = 4
+        nb.nbformat_minor = 2
         
         for line in f:
             comment_type = get_comment_type(line)
@@ -150,9 +154,17 @@ def convert(script_name, validate=True):
         if validate:
             validate_notebook(nb)
 
-        # Write notebook
+        # Write notebook with consistent format (avoid auto-generated ids)
         notebook_name = os.path.splitext(script_name)[0] + '.ipynb'
-        nbformat.write(nb, notebook_name, version=4)
+        
+        # Remove any auto-generated cell ids to maintain clean format
+        for cell in nb.cells:
+            if 'id' in cell:
+                del cell['id']
+        
+        # Write with explicit version to avoid nbformat_minor changes
+        with open(notebook_name, 'w', encoding='utf-8') as f:
+            nbformat.write(nb, f, version=nbformat.NO_CONVERT)
         
         return notebook_name
 
@@ -163,6 +175,10 @@ def validate_notebook(nb):
         # Ensure proper cell structure
         if not hasattr(cell, 'metadata'):
             cell.metadata = {}
+        
+        # Remove auto-generated cell ids for consistent format
+        if 'id' in cell:
+            del cell['id']
         
         if cell.cell_type == 'code':
             # Ensure code cells have required fields
