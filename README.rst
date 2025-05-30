@@ -112,7 +112,8 @@ Command Line Options
 .. code:: bash
 
    py2nb script.py                 # Basic conversion
-   py2nb script.py --no-validate   # Skip notebook validation
+   py2nb script.py --no-validate   # Skip notebook validation  
+   py2nb script.py --execute       # Convert and execute (creates *_executed.ipynb)
 
 Command Blocks
 ==============
@@ -140,6 +141,22 @@ Command blocks allow you to run shell commands (like pip installs) in separate n
 This creates dedicated cells for commands, improving modularity and compatibility
 with platforms like Google Colab.
 
+Execution Option
+================
+
+The ``--execute`` option runs the converted notebook using jupyter nbconvert,
+creating a new notebook with outputs included:
+
+.. code:: bash
+
+   py2nb workshop.py --execute
+
+This creates both ``workshop.ipynb`` (clean) and ``workshop_executed.ipynb`` (with outputs).
+Useful for creating workshop materials with pre-computed results, or for testing
+that your workshop notebooks execute successfully.
+
+**Requirements**: Requires ``nbconvert`` to be installed (``pip install nbconvert``).
+
 Testing
 =======
 
@@ -149,12 +166,13 @@ To run the test suite:
 
    python test_py2nb.py
 
-The test suite includes 13 test cases covering:
+The test suite includes 14 test cases covering:
 
 * Basic conversion functionality
 * Markdown cell creation (``#|`` syntax)
 * Code cell splitting (``#-`` syntax)
 * Command block creation (``#!`` syntax)
+* Notebook execution (``--execute`` option)
 * Mixed syntax combinations
 * Notebook metadata and validation
 * Backward compatibility
@@ -162,5 +180,4 @@ The test suite includes 13 test cases covering:
 
 To do
 =====
-- evaluation option for script produced
 - vim syntax highlighting for markdown code blocks
