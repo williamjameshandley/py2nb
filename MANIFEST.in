@@ -1,0 +1,8 @@
+include README.rst
+include LICENSE
+include example.py
+include example.ipynb
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+exclude test_py2nb.py
+exclude example_executed.ipynb
