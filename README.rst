@@ -127,6 +127,14 @@ then running
 
 produces the notebook `example.ipynb <https://github.com/williamjameshandley/py2nb/blob/master/example.ipynb>`_
 
+To see an executed version with outputs and plots, run:
+
+.. code :: bash
+
+   py2nb example.py --execute --output example_executed
+
+which produces `example_executed.ipynb <https://github.com/williamjameshandley/py2nb/blob/master/example_executed.ipynb>`_ with all code cells executed and outputs displayed.
+
 Command Line Options
 ====================
 

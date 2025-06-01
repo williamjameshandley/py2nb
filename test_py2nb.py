@@ -213,7 +213,7 @@ plt.plot(x)"""
     def test_content_extraction(self):
         """Test content extraction from comment lines."""
         self.assertEqual(py2nb.extract_content('#| markdown text', 'markdown'), ' markdown text')
-        self.assertEqual(py2nb.extract_content('#! pip install numpy', 'command'), 'pip install numpy')
+        self.assertEqual(py2nb.extract_content('#! pip install numpy', 'command'), '!pip install numpy')
         self.assertEqual(py2nb.extract_content('# | spaced markdown', 'markdown'), ' spaced markdown')
 
     def test_file_not_found(self):
