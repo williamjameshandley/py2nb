@@ -3,7 +3,7 @@ py2nb: convert python scripts to jupyter notebooks
 ==================================================
 :py2nb: convert python scripts to jupyter notebooks
 :Author: Will Handley
-:Version: 1.1.0
+:Version: 1.1.1
 :Homepage: https://github.com/williamjameshandley/py2nb
 
 .. image:: https://badge.fury.io/py/py2nb.svg
