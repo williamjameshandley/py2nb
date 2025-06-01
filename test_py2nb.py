@@ -97,7 +97,7 @@ import matplotlib.pyplot as plt"""
         # Check command cell has command tag
         command_cell = nb['cells'][1]
         self.assertIn('command', command_cell.get('metadata', {}).get('tags', []))
-        self.assertIn('pip install numpy', ''.join(command_cell['source']))
+        self.assertIn('!pip install numpy', ''.join(command_cell['source']))
 
     def test_cell_splits(self):
         """Test code cell splitting with #- syntax."""
