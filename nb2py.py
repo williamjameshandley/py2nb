@@ -42,7 +42,11 @@ def convert(notebook_name, output_name=None):
                         # Check if this is a command cell
                         is_command_cell = 'command' in cell.get('metadata', {}).get('tags', [])
                         if is_command_cell:
-                            line = '#! ' + line.lstrip()
+                            # Remove leading ! if present (from py2nb conversion)
+                            stripped_line = line.lstrip()
+                            if stripped_line.startswith('!'):
+                                stripped_line = stripped_line[1:].lstrip()
+                            line = '#! ' + stripped_line
                     line = line.rstrip() + '\n'
                     f_out.write(line)
                 f_out.write('\n')

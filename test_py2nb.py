@@ -97,7 +97,7 @@ import matplotlib.pyplot as plt"""
         # Check command cell has command tag
         command_cell = nb['cells'][1]
         self.assertIn('command', command_cell.get('metadata', {}).get('tags', []))
-        self.assertIn('pip install numpy', ''.join(command_cell['source']))
+        self.assertIn('!pip install numpy', ''.join(command_cell['source']))
 
     def test_cell_splits(self):
         """Test code cell splitting with #- syntax."""
@@ -213,7 +213,7 @@ plt.plot(x)"""
     def test_content_extraction(self):
         """Test content extraction from comment lines."""
         self.assertEqual(py2nb.extract_content('#| markdown text', 'markdown'), ' markdown text')
-        self.assertEqual(py2nb.extract_content('#! pip install numpy', 'command'), 'pip install numpy')
+        self.assertEqual(py2nb.extract_content('#! pip install numpy', 'command'), '!pip install numpy')
         self.assertEqual(py2nb.extract_content('# | spaced markdown', 'markdown'), ' spaced markdown')
 
     def test_file_not_found(self):

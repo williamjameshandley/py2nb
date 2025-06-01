@@ -3,7 +3,7 @@ py2nb: convert python scripts to jupyter notebooks
 ==================================================
 :py2nb: convert python scripts to jupyter notebooks
 :Author: Will Handley
-:Version: 1.1.0
+:Version: 1.1.1
 :Homepage: https://github.com/williamjameshandley/py2nb
 
 .. image:: https://badge.fury.io/py/py2nb.svg
@@ -126,6 +126,14 @@ then running
    py2nb example.py
 
 produces the notebook `example.ipynb <https://github.com/williamjameshandley/py2nb/blob/master/example.ipynb>`_
+
+To see an executed version with outputs and plots, run:
+
+.. code :: bash
+
+   py2nb example.py --execute --output example_executed
+
+which produces `example_executed.ipynb <https://github.com/williamjameshandley/py2nb/blob/master/example_executed.ipynb>`_ with all code cells executed and outputs displayed.
 
 Command Line Options
 ====================
