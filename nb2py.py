@@ -15,6 +15,18 @@ import json
 # Export main functions for module use
 __all__ = ['convert']
 
+def get_version():
+    """Get version from README.rst file."""
+    try:
+        readme_path = os.path.join(os.path.dirname(__file__), 'README.rst')
+        with open(readme_path, 'r') as f:
+            for line in f:
+                if ':Version:' in line:
+                    return line.split(':')[2].strip()
+    except (FileNotFoundError, IndexError):
+        pass
+    return "unknown"
+
 
 def convert(notebook_name, output_name=None):
     """ Convert the jupyter notebook to python script"""
@@ -59,15 +71,24 @@ def parse_args():
     """Argument parsing for nb2py"""
     description = "Convert a jupyter notebook to a python script"
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("notebook_name", help="name of notebok (.ipynb) to convert to script (.py)")
+    parser.add_argument("notebook_name", nargs='?', help="name of notebok (.ipynb) to convert to script (.py)")
     parser.add_argument(
         "--output", 
         help="specify output script filename (default: notebook_name.py)")
+    parser.add_argument(
+        "--version", 
+        action="version",
+        version=f"nb2py {get_version()}")
     return parser.parse_args() 
 
 
 def main():
     args = parse_args()
+    
+    if args.notebook_name is None:
+        print("Error: notebook_name is required")
+        return 1
+    
     script_name = convert(args.notebook_name, output_name=args.output)
     print(f"✓ Successfully converted {args.notebook_name} to {script_name}")
     return script_name

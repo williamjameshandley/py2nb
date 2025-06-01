@@ -19,6 +19,18 @@ import nbformat.v4
 # Export main functions for module use
 __all__ = ['convert', 'execute_notebook', 'validate_notebook', 'CELL_SPLIT_CHARS', 'MARKDOWN_CHARS', 'COMMAND_CHARS']
 
+def get_version():
+    """Get version from README.rst file."""
+    try:
+        readme_path = os.path.join(os.path.dirname(__file__), 'README.rst')
+        with open(readme_path, 'r') as f:
+            for line in f:
+                if ':Version:' in line:
+                    return line.split(':')[2].strip()
+    except (FileNotFoundError, IndexError):
+        pass
+    return "unknown"
+
 # Comment syntax patterns
 CELL_SPLIT_CHARS = ['#-', '# -']
 MARKDOWN_CHARS = ['#|', '# |']
@@ -262,6 +274,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
         "script_name",
+        nargs='?',
         help="name of script (.py) to convert to jupyter notebook (.ipynb)")
     parser.add_argument(
         "--no-validate", 
@@ -274,12 +287,20 @@ def parse_args():
     parser.add_argument(
         "--output", 
         help="specify output notebook filename (default: script_name.ipynb)")
+    parser.add_argument(
+        "--version", 
+        action="version",
+        version=f"py2nb {get_version()}")
     return parser.parse_args()
 
 
 def main():
     """Main conversion function."""
     args = parse_args()
+    
+    if args.script_name is None:
+        print("Error: script_name is required")
+        return 1
     
     if not os.path.exists(args.script_name):
         print(f"Error: File {args.script_name} not found")
