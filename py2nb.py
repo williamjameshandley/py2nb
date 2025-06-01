@@ -142,8 +142,10 @@ def convert(script_name, validate=True, execute=False, output_name=None):
                 elif comment_type == 'command':
                     # Finish any pending markdown cell
                     markdown_cell = new_cell(nb, markdown_cell, 'markdown')
-                    # Add to command cell
-                    command_cell += extract_content(line, 'command') + '\n'
+                    # Add to command cell (add newline only if cell already has content)
+                    if command_cell:
+                        command_cell += '\n'
+                    command_cell += extract_content(line, 'command')
                 elif comment_type == 'split':
                     # Finish any pending cells and start fresh
                     markdown_cell = new_cell(nb, markdown_cell, 'markdown')
