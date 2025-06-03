@@ -22,7 +22,7 @@ __all__ = ['convert', 'execute_notebook', 'validate_notebook', 'CELL_SPLIT_CHARS
 # Comment syntax patterns
 CELL_SPLIT_CHARS = ['#-', '# -']
 MARKDOWN_CHARS = ['#|', '# |']
-COMMAND_CHARS = ['#!', '# !']
+COMMAND_CHARS = ['#!', '# !', '#%', '# %']
 ACCEPTED_CHARS = CELL_SPLIT_CHARS + MARKDOWN_CHARS + COMMAND_CHARS
 
 def new_cell(nb, cell_content, cell_type='code'):
@@ -90,8 +90,11 @@ def get_comment_type(line):
 def extract_content(line, comment_type):
     """Extract content from comment line based on type."""
     if comment_type == 'command':
-        # Find first ! and return ! plus everything after it
-        return '!' + line[line.index('!') + 1:].lstrip()
+        # Find first ! or % and return the command marker plus everything after it
+        if '!' in line:
+            return '!' + line[line.index('!') + 1:].lstrip()
+        elif '%' in line:
+            return '%' + line[line.index('%') + 1:].lstrip()
     elif comment_type == 'markdown':
         # Find first | and return everything after it  
         return line[line.index('|') + 1:]
