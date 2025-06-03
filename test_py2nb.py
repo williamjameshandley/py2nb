@@ -99,6 +99,69 @@ import matplotlib.pyplot as plt"""
         self.assertIn('command', command_cell.get('metadata', {}).get('tags', []))
         self.assertIn('!pip install numpy', ''.join(command_cell['source']))
 
+    def test_percent_command_blocks(self):
+        """Test command block creation with #% syntax."""
+        script_content = """#| # Test Percent Magic Commands
+
+#% matplotlib inline
+#% load_ext autoreload
+#% autoreload 2
+
+import numpy as np
+import matplotlib.pyplot as plt"""
+        
+        script_path = self.create_test_script(script_content)
+        notebook_path = py2nb.convert(script_path)
+        
+        with open(notebook_path, 'r') as f:
+            nb = json.load(f)
+        
+        # Should have: markdown, command, code cells
+        self.assertEqual(len(nb['cells']), 3)
+        self.assertEqual(nb['cells'][0]['cell_type'], 'markdown')
+        self.assertEqual(nb['cells'][1]['cell_type'], 'code')
+        self.assertEqual(nb['cells'][2]['cell_type'], 'code')
+        
+        # Check command cell has command tag
+        command_cell = nb['cells'][1]
+        self.assertIn('command', command_cell.get('metadata', {}).get('tags', []))
+        self.assertIn('%matplotlib inline', ''.join(command_cell['source']))
+        self.assertIn('%load_ext autoreload', ''.join(command_cell['source']))
+
+    def test_mixed_command_types(self):
+        """Test mixing #! and #% command types."""
+        script_content = """#| # Mixed Command Types Test
+
+#! pip install numpy
+#% matplotlib inline
+#% load_ext autoreload
+#! pip install matplotlib
+#% autoreload 2
+
+import numpy as np"""
+        
+        script_path = self.create_test_script(script_content)
+        notebook_path = py2nb.convert(script_path)
+        
+        with open(notebook_path, 'r') as f:
+            nb = json.load(f)
+        
+        # Should have: markdown, command, code cells
+        self.assertEqual(len(nb['cells']), 3)
+        self.assertEqual(nb['cells'][0]['cell_type'], 'markdown')
+        self.assertEqual(nb['cells'][1]['cell_type'], 'code')
+        self.assertEqual(nb['cells'][2]['cell_type'], 'code')
+        
+        # Check command cell contains both ! and % commands
+        command_cell = nb['cells'][1]
+        self.assertIn('command', command_cell.get('metadata', {}).get('tags', []))
+        command_source = ''.join(command_cell['source'])
+        self.assertIn('!pip install numpy', command_source)
+        self.assertIn('%matplotlib inline', command_source)
+        self.assertIn('%load_ext autoreload', command_source)
+        self.assertIn('!pip install matplotlib', command_source)
+        self.assertIn('%autoreload 2', command_source)
+
     def test_cell_splits(self):
         """Test code cell splitting with #- syntax."""
         script_content = """x = 1
@@ -125,6 +188,7 @@ print(z)"""
 #| This tests all comment types together
 
 #! pip install numpy
+#% matplotlib inline
 
 import numpy as np
 
@@ -135,6 +199,7 @@ x = np.array([1, 2, 3])
 #-
 
 #! pip install matplotlib
+#% load_ext autoreload
 
 import matplotlib.pyplot as plt
 plt.plot(x)"""
@@ -206,6 +271,8 @@ plt.plot(x)"""
         self.assertEqual(py2nb.get_comment_type('# | markdown'), 'markdown')
         self.assertEqual(py2nb.get_comment_type('#! install'), 'command')
         self.assertEqual(py2nb.get_comment_type('# ! install'), 'command')
+        self.assertEqual(py2nb.get_comment_type('#% magic'), 'command')
+        self.assertEqual(py2nb.get_comment_type('# % magic'), 'command')
         self.assertEqual(py2nb.get_comment_type('#- split'), 'split')
         self.assertEqual(py2nb.get_comment_type('# - split'), 'split')
         self.assertIsNone(py2nb.get_comment_type('# regular comment'))
@@ -214,7 +281,9 @@ plt.plot(x)"""
         """Test content extraction from comment lines."""
         self.assertEqual(py2nb.extract_content('#| markdown text', 'markdown'), ' markdown text')
         self.assertEqual(py2nb.extract_content('#! pip install numpy', 'command'), '!pip install numpy')
+        self.assertEqual(py2nb.extract_content('#% matplotlib inline', 'command'), '%matplotlib inline')
         self.assertEqual(py2nb.extract_content('# | spaced markdown', 'markdown'), ' spaced markdown')
+        self.assertEqual(py2nb.extract_content('# % config InlineBackend', 'command'), '%config InlineBackend')
 
     def test_file_not_found(self):
         """Test handling of non-existent files."""
